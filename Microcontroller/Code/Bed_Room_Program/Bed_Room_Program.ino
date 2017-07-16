@@ -1,5 +1,8 @@
 /*
- * Arduino Team:
+ * Main Control Team
+ * Arduino Control: Sultan Ibrahim Ibrahim
+ * commented commands are used for debugging 
+ * NRF24l01+ connections:
     MOSI is connected to the digital pin 11
     MISO is connected to the digital pin 12
     SCK is connected to the digital pin 13
@@ -49,9 +52,6 @@ int current_time;                   //to store the time at point in the program
 int lightState;                     //to stores whether the light is turned on or off
 int fanState;                       //to stores whether the fan is turned on or off
 int heaterState;                    //to stores whether the heater is turned on or off
-//bool fireAlarm;
-//bool gasAlarm;
-//bool PIRAlarm;
 
 bool enable = true;                 //enable or disable automatic light control
 float onReference  = 3.0;           //referenc voltage to turn light off if below it
@@ -87,17 +87,18 @@ void setup() {
 
 void loop() {
 
+  //check is serial bus is connected
   if(Serial){
-    serial_state = 1;
+    serial_state = 1;                         //set the serial state to 1 (true) if serial is connected
   }
   else{
-    serial_state = 0;
+    serial_state = 0;                         //set the serial state to 0 (false) if serial is NOT connected
   }
 
-  if(Serial.available() && serial_state){ //for printing data to serial
+  if(Serial.available() && serial_state){ //for printing data to serial, check is serial bus is connected before printing
     //Serial.println("in serial available");
     char c = toupper(Serial.read());      //just to empty serial buffer
-    printData();
+    printData();                          //print the readings of all the sensors
   }
 
   if (radio.available()){                     //if data are found in nrf24 buffer 
@@ -239,8 +240,8 @@ bool sendData(){//write all the available sensors reading to nRF24 which in turn
 }
 
 void printData(){                                                 //print data (readings) to serial (for debugging)
-    if(!serial_state){
-      return;
+    if(!serial_state){                                            //check to see if serial bus is not connected
+      return;                                                     //if not connected then exit the function. there is no one to print to.
     }
     Serial.println("-------------------------------------------------");
     Serial.print("Photo Resistor Voltage: ");
@@ -292,7 +293,7 @@ int reply() {
     printData();                                         //print all readings to serial (line: 222)
     
     if(!ret){                                           //if sending failed
-      if(serial_state){
+      if(serial_state){                                 //check to see if serial bus is connected
         Serial.println("Data was not sent successfully!");
         Serial.println("-------------------------------------------------");
       }
@@ -319,8 +320,8 @@ int reply() {
   
   //-------------------------------------------------------------
   else if (strcmp(data , "lightReference") == 0) {      //indicate that Rpi wants to set light reference to a new value
-    if(serial_state){
-      Serial.println("entering light ref");               //for debugging
+    if(serial_state){                                   //check to see if serial bus is connected
+      Serial.println("entering light ref");             //for debugging
       Serial.println("---------------------------------------");
     }
     //send_light_data:                                  //used in previous version of this communication protocol
@@ -369,7 +370,7 @@ int reply() {
     SW.reset();                                                //reset the counter
       
     if(timeout){
-      if(serial_state){
+      if(serial_state){                                          //check to see if serial bus is connected
         Serial.println("Timeout, no incoming data");             //print error message and then retry sending data
         Serial.println("---------------------------------------");
       }
@@ -378,7 +379,7 @@ int reply() {
     }
     else{                                                     //if no error happened in reading
       radio.read(&onReference, sizeof(float));                //read the on light refrence 
-      if(serial_state){
+      if(serial_state){                                       //check to see if serial bus is connected
         Serial.print("onRef received: "); Serial.println(onReference);
         Serial.println("---------------------------------------");
       }
@@ -388,7 +389,7 @@ int reply() {
 
 //--------------------------------------*****************************************************************
   else if (strcmp(data , "tempReference") == 0) {             //incoming message indicate that Rpi wants to set light reference to a new value, do the same as before
-    if(serial_state){
+    if(serial_state){                                         //check to see if serial bus is connected
       Serial.println("entering temp ref");
       Serial.println("---------------------------------------");
     }
@@ -409,8 +410,8 @@ int reply() {
     if (!ret) {                                               //if transmission fialed
       radio.startListening();                                 //start listening for incoming messages, Rpi might send some other message later on
       //radio.printDetails();
-      if(serial_state){
-        Serial.println("failed to send ACK");                   //print error message if module failed to send data
+      if(serial_state){                                       //check to see if serial bus is connected
+        Serial.println("failed to send ACK");                 //print error message if module failed to send data
         Serial.println("---------------------------------------");
       }
       return 1;                                               //exit with error
@@ -418,15 +419,15 @@ int reply() {
     }
 
     radio.startListening();
-    if(serial_state){
+    if(serial_state){                                        //check to see if serial bus is connected
       Serial.print("number of retries: "); Serial.println(retry);
       Serial.println("sent ACK successfully");
     }
     timeout = false;
     SW.start();
-    while(!radio.available()){                                  //wait for 400ms for incoming message
+    while(!radio.available()){                                 //wait for 400ms for incoming message
       if(SW.elapsed() > 400){
-        if(serial_state){
+        if(serial_state){                                      //check to see if serial bus is connected
           Serial.print("time: "); Serial.println(SW.elapsed());
         }
         timeout = true;
@@ -438,7 +439,7 @@ int reply() {
     SW.reset();
     
     if(timeout){
-      if(serial_state){
+      if(serial_state){                                             //check to see if serial bus is connected
         Serial.println("Timeout, no incoming data");               //print error message and then retry sending data
         Serial.println("---------------------------------------");
       }
@@ -447,7 +448,7 @@ int reply() {
     }
     else{
       radio.read(&tempReference, sizeof(float));
-      if(serial_state){
+      if(serial_state){                                           //check to see if serial bus is connected
         Serial.print("tempReference received: "); Serial.println(tempReference);
         Serial.println("---------------------------------------");
       }
@@ -457,7 +458,7 @@ int reply() {
 //----------------------------------------------------**********************************************************
   else {                                                        //if the incoming message is non of what we and Rpi team agreed upon then some error happened during transmission, send unknown command back
     radio.stopListening();                                      //stop listening because we're about to send UC
-    if(serial_state){
+    if(serial_state){                                           //check to see if serial bus is connected
       Serial.println("---------------------------------------");
       Serial.println("unknown command!");
       Serial.print("command is: "); Serial.print(data); Serial.print(", or: "); Serial.println((atof(data)));

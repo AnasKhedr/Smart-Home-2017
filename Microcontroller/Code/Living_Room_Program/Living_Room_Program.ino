@@ -1,5 +1,8 @@
 /*
- * Arduino Team:
+ * Main Control Team
+ * Arduino Control: Sultan Ibrahim Ibrahim
+ * commented commands are used for debugging 
+ * NRF24l01+ connections:
     MOSI is connected to the digital pin 11
     MISO is connected to the digital pin 12
     SCK is connected to the digital pin 13
@@ -53,13 +56,13 @@ int PIRState;                       //to store the PIR sensors digital reading
 int fanState;                       //to store whether the fan is turned on or off
 int heaterState;                    //to store whether the heater is turned on or off
 int garageState;                    //to store whether the garage is open or closed
-float photoResistorVoltage;
-float onReference  = 3.0;
+float photoResistorVoltage;         //to store the voltage from the photoresistor
+float onReference  = 3.0;           //referenc voltage to turn light off if below it
 byte retry;                         //to print the number of retries that the program will attempt to send ACK to Rpi before giving up
-int startPosition;
-int tvState;
-float humidityOutside;
-float temperatureOutside;
+//int startPosition;
+int tvState;                        //to store TV state, either on or off
+float humidityOutside;              //to store the percentage of the humidity measured outside the house
+float temperatureOutside;           //to store the temperature in celsius outside the house
 
 bool timeout = false;               //to know when time out and stop the wait for something to happen and move on
 bool ret = false;                   //the return of the attempt to write all data to Rpi (0: failed, 1: success)
@@ -114,11 +117,12 @@ void setup() {
 
 void loop() {
 
+  //check is serial bus is connected
   if(Serial){
-    serial_state = 1;
+    serial_state = 1;                    //set the serial state to 1 (true) if serial is connected
   }
   else{
-    serial_state = 0;
+    serial_state = 0;                   //set the serial state to 0 (false) if serial is NOT connected
   }
   
   if(Serial.available() && serial_state){ //for printing data to serial
@@ -324,9 +328,9 @@ bool sendData(){//write all the available sensors reading to nRF24 which in turn
 }
 
 void printData(){                                                 //print data (readings) to serial (for debugging)
-    if(!serial_state)
-      return
-    
+    if(!serial_state){                                            //check to see if serial bus is not connected
+      return;                                                     //if not connected then exit the function. there is no one to print to.
+    }
     Serial.println("-------------------------------------------------");
     Serial.print("Photo Resistor Voltage: ");
     Serial.println(photoResistorVoltage);
@@ -362,7 +366,7 @@ void receiver(){
   while (radio.available()) {                              //read all data in buffer
     radio.read(&data, sizeof(char[40]));                   //append all byets to string after converting (casting) them to char
   }
-  if(serial_state){
+  if(serial_state){                                        //check to see if serial bus is connected
     Serial.print("recevied: "); Serial.println(data);      //for debugging
   }
   reply();                                                 //call reply function to respond correctly to the message sent (line: 261)
@@ -383,14 +387,14 @@ void reply(){
     printData();                                         //print all readings to serial (line: 222)
     
     if(!ret){                                           //if sending failed
-      if(serial_state){
+      if(serial_state){                                 //check to see if serial bus is connected
         Serial.println("Data was NOT sent successfully!");
         Serial.println("-------------------------------------------------");
       }
       return 1;                                         //exit function completlry with error (1 indicate error and 0 indicate success[standard error and success return])
     }
     else{                                               //if the write was successful
-      if(serial_state){
+      if(serial_state){                                 //check to see if serial bus is connected
         Serial.println("Data was sent successfully");
         Serial.println("-------------------------------------------------");
       }
@@ -418,10 +422,10 @@ void reply(){
     
     radio.flush_tx();                                          //empty the tx buffer just to be sure
     
-    if (!ret) {                                               //if transmission fialed
+    if (!ret) {                                               //if  transmission fialed                                               //if transmission fialed
       radio.startListening();                                 //start listening for incoming messages, Rpi might send some other message later on
       //radio.printDetails();
-      if(serial_state){
+      if(serial_state){                                       //check to see if serial bus is connected
         Serial.println("failed to send ACK");                   //print error message if module failed to send data
         Serial.println("---------------------------------------");
       }
@@ -430,7 +434,7 @@ void reply(){
     }
 
     radio.startListening();                                   //start listening for incoming messages, Rpi might send some other message later on
-    if(serial_state){
+    if(serial_state){                                         //check to see if serial bus is connected
       Serial.print("number of retries: "); Serial.println(retry);
       Serial.println("sent ACK successfully");
     }
@@ -449,8 +453,8 @@ void reply(){
     SW.stop();                                                 //stop the counter
     SW.reset();                                                //reset the counter
       
-    if(timeout){
-      if(serial_state){
+    if(timeout){                                                 //400ms passed without receiving data
+      if(serial_state){                                          //check to see if serial bus is connected
         Serial.println("Timeout, no incoming data");             //print error message and then retry sending data
         Serial.println("---------------------------------------");
       }
@@ -459,7 +463,7 @@ void reply(){
     }
     else{                                                     //if no error happened in reading
       radio.read(&onReference, sizeof(float));                //read the on light refrence 
-      if(serial_state){
+      if(serial_state){                                       //check to see if serial bus is connected
         Serial.print("onRef received: "); Serial.println(onReference);
         Serial.println("---------------------------------------");
       }
@@ -469,7 +473,7 @@ void reply(){
 
   //-------------------------------------------------------------
   else if (strcmp(data , "tempReference") == 0){
-    if(serial_state){
+    if(serial_state){                                         //check to see if serial bus is connected
       Serial.println("entering temp ref");
       Serial.println("---------------------------------------");
     }
@@ -484,14 +488,14 @@ void reply(){
       retry ++;
       delay(1);
     }
-    //Serial.println("doen writing");
+    //Serial.println("done writing");
     radio.flush_tx();
     
-    if (!ret) {
+    if (!ret) {                                                 //if  transmission fialed
       radio.startListening();
       //radio.printDetails();
-      if(serial_state){
-        Serial.println("failed to send ACK");  //print error message if module failed to send data
+      if(serial_state){                                          //check to see if serial bus is connected
+        Serial.println("failed to send ACK");                    //print error message if module failed to send data
         Serial.println("---------------------------------------");
       }
       return 1;
@@ -499,7 +503,7 @@ void reply(){
     }
 
     radio.startListening();
-    if(serial_state){
+    if(serial_state){                                           //check to see if serial bus is connected
       Serial.print("number of retries: "); Serial.println(retry);
       Serial.println("sent ACK successfully");
     }
@@ -517,17 +521,17 @@ void reply(){
     SW.stop();
     SW.reset();
     
-    if(timeout){
-      if(serial_state){
+    if(timeout){                                                  //400ms passed without receiving data
+      if(serial_state){                                           //check to see if serial bus is connected
        Serial.println("Timeout, no incoming data");               //print error message and then retry sending data
        Serial.println("---------------------------------------");
       }
       //goto send_data;
       return 1;
     }
-    else{
+    else{                                                         //if no error happened in reading
       radio.read(&tempReference, sizeof(float));
-      if(serial_state){
+      if(serial_state){                                           //check if serial bus is connected
         Serial.print("tempReference received: "); Serial.println(tempReference);
         Serial.println("---------------------------------------");
       }
@@ -537,7 +541,7 @@ void reply(){
 
   //-------------------------------------------------------------
   else if(strcmp(data , "tvOn") == 0){
-    if(serial_state){
+    if(serial_state){                                           //check to see if serial bus is connected
       Serial.println("entering tvOn");
       Serial.println("---------------------------------------");
     }
@@ -558,11 +562,11 @@ void reply(){
 
     radio.flush_tx();
     
-    if (!ret) {
+    if (!ret) {                                               //if  transmission fialed
       radio.startListening();
       //radio.printDetails();
-      if(serial_state){
-        Serial.println("failed to send ACK");  //print error message if module failed to send data
+      if(serial_state){                                       //check to see if serial bus is connected
+        Serial.println("failed to send ACK");                 //print error message if module failed to send data
         Serial.println("---------------------------------------");
       }
       return 1;
@@ -570,7 +574,7 @@ void reply(){
     }
 
     radio.startListening();
-    if(serial_state){
+    if(serial_state){                                        //check to see if serial bus is connected
       Serial.print("number of retries: "); Serial.println(retry);
       Serial.println("sent ACK successfully");
     }
@@ -579,7 +583,7 @@ void reply(){
 
   //-------------------------------------------------------------
   else if(strcmp(data , "tvOff") == 0){
-    if(serial_state){
+    if(serial_state){                                        //check to see if serial bus is connected
       Serial.println("entering tvOff");
       Serial.println("---------------------------------------");
     }
@@ -598,10 +602,10 @@ void reply(){
 
     radio.flush_tx();
     
-    if (!ret) {
+    if (!ret) {                                               //if  transmission fialed
       radio.startListening();
       //radio.printDetails();
-      if(serial_state){
+      if(serial_state){                                       //check to see if serial bus is connected
         Serial.println("failed to send ACK");  //print error message if module failed to send data
         Serial.println("---------------------------------------");
       }
@@ -610,7 +614,7 @@ void reply(){
     }
 
     radio.startListening();
-    if(serial_state){
+    if(serial_state){                                         //check to see if serial bus is connected
       Serial.print("number of retries: "); Serial.println(retry);
       Serial.println("sent ACK successfully");
     }
@@ -618,7 +622,7 @@ void reply(){
 
   //-------------------------------------------------------------
   else if(strcmp(data , "openGarageDoor") == 0){
-    if(serial_state){
+    if(serial_state){                                         //check to see if serial bus is connected
       Serial.println("---------------------------------------");
       Serial.println("entering openGarageDoor");
     }
@@ -636,11 +640,11 @@ void reply(){
         retry ++;
         delay(1);
       }
-      if (!ret) {
+      if (!ret) {                                               //if  transmission fialed
         radio.startListening();
         //radio.printDetails();
-        if(serial_state){
-          Serial.println("failed to send ACK");  //print error message if module failed to send data
+        if(serial_state){                                       //check to see if serial bus is connected
+          Serial.println("failed to send ACK");                 //print error message if module failed to send data
           Serial.println("---------------------------------------");
         }
         return 1;
@@ -655,11 +659,11 @@ void reply(){
         delay(1);
       }
 
-      if (!ret) {
+      if (!ret) {                                               //if  transmission fialed
         radio.startListening();
         //radio.printDetails();
-        if(serial_state){
-          Serial.println("failed to send NACK");  //print error message if module failed to send data
+        if(serial_state){                                       //check to see if serial bus is connected
+          Serial.println("failed to send NACK");                //print error message if module failed to send data
           Serial.println("---------------------------------------");
         }
         return 1;
@@ -670,7 +674,7 @@ void reply(){
     radio.flush_tx();  
 
     radio.startListening();
-    if(serial_state){
+    if(serial_state){                                          //check to see if serial bus is connected
       Serial.print("number of retries: "); Serial.println(retry);
       Serial.println("sent ACK/NACK successfully");
       Serial.println("---------------------------------------");
@@ -680,12 +684,12 @@ void reply(){
 
   //-------------------------------------------------------------
   else if(strcmp(data , "closeGarageDoor") == 0){
-    if(serial_state){
+    if(serial_state){                                         //check to see if serial bus is connected
     Serial.println("---------------------------------------");
     Serial.println("entering closeGarageDoor");
     }
     
-    garageRetern = garageDoorControl(1);                                             //close garage door
+    garageRetern = garageDoorControl(1);                         //close garage door
     radio.stopListening();
     
     ret = false;
@@ -698,11 +702,11 @@ void reply(){
         retry ++;
         delay(1);
       }
-      if (!ret) {
+      if (!ret) {                                               //if  transmission fialed
         radio.startListening();
         //radio.printDetails();
-        if(serial_state){
-          Serial.println("failed to send ACK");  //print error message if module failed to send data
+        if(serial_state){                                       //check to see if serial bus is connected 
+          Serial.println("failed to send ACK");                 //print error message if module failed to send data
           Serial.println("---------------------------------------");
         }
         return 1;
@@ -716,11 +720,11 @@ void reply(){
         retry ++;
         delay(1);
       }
-      if (!ret) {
+      if (!ret) {                                               //if  transmission fialed
         radio.startListening();
-        //radio.printDetails();
+        //radio.printDetails();                                  //check to see if serial bus is connected
         if(serial_state){
-          Serial.println("failed to send NACK");  //print error message if module failed to send data
+          Serial.println("failed to send NACK");                 //print error message if module failed to send data
           Serial.println("---------------------------------------");
         }
         return 1;
@@ -731,7 +735,7 @@ void reply(){
     radio.flush_tx();
     
     radio.startListening();
-    if(serial_state){
+    if(serial_state){                                            //check to see if serial bus is connected
       Serial.print("number of retries: "); Serial.println(retry);
       Serial.println("sent ACK/NACK successfully");
       Serial.println("---------------------------------------");
@@ -741,7 +745,7 @@ void reply(){
 
   else{
     radio.stopListening();                                      //stop listening because we're about to send UC
-    if(serial_state){
+    if(serial_state){                                           //check to see if serial bus is connected
       Serial.println("---------------------------------------");
       Serial.println("unknown command!");
       Serial.print("command is: "); Serial.print(data); Serial.print(", or: "); Serial.println((atof(data)));

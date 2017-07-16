@@ -1,0 +1,11 @@
+for 28BYJ-48 Stepper Motor
+video: https://youtu.be/B86nqDRskVU?t=811
+//--------------------------------------------------------------
+
+Wave step: 11.25 degree step angle with 32 for a complete revolution (360 degree)		 [2048 steps per motor shaft(outer gear) rotation with 0.18 degree step angle]
+Full Step: 11.25 degree step angle with 32 for a complete revolution (360 degree) (higher tourq) [2048 steps per motor shaft(outer gear) rotation with 0.18 degree step angle]
+Half Step: 5.625 degree step angle with 64 for a complete revolution (360 degree)		 [4096 steps per motor shaft(outer gear) rotation with 0.09 degree step angle]
+
+----------------------------------------------------------------
+64:1 gear ration
+meaning that the inner gear that connected to the motor has to rotate 64 full rotation for the outer gear to rotate only once.

@@ -19,10 +19,10 @@ source: https://github.com/ahmedorabi94/MrHome
 
 # full list of contributors:
 ```
-* *Ahmed Mahmoud Ali*             (Android App Team)
-* *Anas Ahmed Fouad*              (Hardware Team)
-* *Mahmoud El-Sayed Hussein*      (Website and server Team)
-* *Menna-Allah Ashraf Zaher*      (Hardware Team)
-* *Mustafa Kamel El-Sayed*        (Website and server Team)
-* *Sultan Ibrahim Ibrahim*        (Hardware Team)
+* *Ahmed Mahmoud Ali             (Android App Team)*
+* *Anas Ahmed Fouad              (Hardware Team)*
+* *Mahmoud El-Sayed Hussein      (Website and server Team)*
+* *Menna-Allah Ashraf Zaher      (Hardware Team)*
+* *Mustafa Kamel El-Sayed        (Website and server Team)*
+* *Sultan Ibrahim Ibrahim        (Hardware Team)*
 ```

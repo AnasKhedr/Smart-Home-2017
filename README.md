@@ -18,7 +18,7 @@ source: https://github.com/ahmedorabi94/MrHome
 # ---------------------------------------------------------------------
 
 # full list of contributors:
-## Ahmed Mahmoud
+* Ahmed Mahmoud*
 ## Ali Anas Ahmed Fouad
 ## Mahmoud El-Sayed Hussein
 ## Menna-Allah Ashraf Zaher 

@@ -1,4 +1,4 @@
-# Smart-Home-2017
+# MrHome-2017
 Part of my Graduation project on Smart Homes Summer 2017
 This is the Raspberry Pi and the microcontroller Part
 for full documentation: http://104.236.106.121/SmartHome/web/assets/Connectvia.pdf  

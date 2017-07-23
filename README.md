@@ -18,9 +18,11 @@ source: https://github.com/ahmedorabi94/MrHome
 # ---------------------------------------------------------------------
 
 # full list of contributors:
-* Ahmed Mahmoud*
-## Ali Anas Ahmed Fouad
-## Mahmoud El-Sayed Hussein
-## Menna-Allah Ashraf Zaher 
-## Mustafa Kamel El-Sayed
-## Sultan Ibrahim Ibrahim
+'
+* *Ahmed Mahmoud*
+* *Ali Anas Ahmed Fouad*
+* *Mahmoud El-Sayed Hussein*
+* *Menna-Allah Ashraf Zaher* 
+* *Mustafa Kamel El-Sayed*
+* *Sultan Ibrahim Ibrahim*
+'

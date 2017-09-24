@@ -3,6 +3,8 @@ Part of my Graduation project on Smart Homes Summer 2017
 This is the Raspberry Pi and the microcontroller Part
 for full documentation: https://github.com/AnasKhedr/Smart-Home-2017/blob/master/REMOTE%20CONTROL%20SYSTEM%20FOR%20SMART%20HOMES.pdf 
 
+Quick review video for the project **in Arabic** : https://youtu.be/fKeyGMhUnGM 
+
 # ---------------------------------------------------------------------
 
 # Website Part

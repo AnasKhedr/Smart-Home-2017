@@ -1,6 +1,8 @@
 # MrHome-2017
-Our Graduation project on Smart Home Summer 2017
-Ready for implementation as a standalone house or an entire city
+Our Graduation project on Smart Home Summer 2017.
+
+Ready for implementation as a standalone house or an entire city.
+
 This is the Raspberry Pi and the microcontroller Part
 for full documentation: https://github.com/AnasKhedr/Smart-Home-2017/blob/master/REMOTE%20CONTROL%20SYSTEM%20FOR%20SMART%20HOMES.pdf 
 
